@@ -17,11 +17,12 @@ services:
     build: .
     environment:
       DATABASE_URL: postgresql://segment:segment@db:5432/segment_generator
+      PORT: ${PORT:-8000}
     depends_on:
       db:
         condition: service_healthy
     ports:
-      - "8000:8000"
+      - "${PORT:-8000}:${PORT:-8000}"
 
 volumes:
   postgres_data:

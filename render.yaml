@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: segment-generator-api
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: segment-generator-db
+          property: connectionString
+
+databases:
+  - name: segment-generator-db
+    plan: free
+    region: singapore
+    databaseName: segment_generator
+    user: segment
+    postgresMajorVersion: "16"

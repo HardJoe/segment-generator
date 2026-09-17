@@ -1,13 +1,9 @@
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
-
-from fastapi import Depends, FastAPI
-from starlette.concurrency import run_in_threadpool
+from fastapi import Depends, FastAPI, HTTPException, status
+from psycopg import Error as PsycopgError
 
 from app.database import (
     CanvasRepository,
     PostgresCanvasRepository,
-    initialize_database,
 )
 from app.domain import Canvas
 from app.segments import SegmentGenerator
@@ -49,14 +45,21 @@ def serialize_canvas(canvas: Canvas) -> dict[str, list[dict[str, object]]]:
     }
 
 
-def create_app(*, initialize_on_startup: bool = True) -> FastAPI:
-    @asynccontextmanager
-    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-        if initialize_on_startup:
-            await run_in_threadpool(initialize_database)
-        yield
+def create_app() -> FastAPI:
+    application = FastAPI(title="Segment Generator")
 
-    application = FastAPI(title="Segment Generator", lifespan=lifespan)
+    @application.get("/health")
+    def get_health(
+        repository: CanvasRepository = Depends(get_repository),
+    ) -> dict[str, str]:
+        try:
+            repository.health_check()
+        except PsycopgError as error:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="database unavailable",
+            ) from error
+        return {"status": "ok"}
 
     @application.get("/api/canvas")
     def get_canvas(

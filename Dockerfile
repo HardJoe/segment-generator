@@ -10,7 +10,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
 COPY db ./db
+COPY scripts ./scripts
+
+RUN chmod +x ./scripts/start-api.sh
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["./scripts/start-api.sh"]
