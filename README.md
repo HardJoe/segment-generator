@@ -1,5 +1,7 @@
 # Segment Generator
 
+Production API: <https://segment-generator-api.onrender.com/>
+
 ## How to run the API
 
 Requirements: Docker with Docker Compose support.
@@ -9,9 +11,6 @@ docker compose up --build
 ```
 
 The API starts at `http://localhost:8000`.
-
-The Render production URL is assigned during the first Dashboard deploy. Record it here
-once available: `https://<segment-generator-api>.onrender.com`.
 
 Available endpoints:
 
@@ -39,6 +38,7 @@ python3 -m venv .venv
 - [Architecture](docs/architecture.md): data model and traversal design.
 - [Design decisions](docs/decisions.md): rationale for the main implementation choices.
 - [Technology stack](docs/technology-stack.md): runtime, framework, database, testing, and containerization tools used.
+- [Deployment](docs/deployment.md): Render setup, GitHub Actions, and production-service details.
 
 ## Project layout
 
@@ -47,20 +47,3 @@ python3 -m venv .venv
 - `docs/`: reviewer-facing architecture and design documentation.
 - `tests/`: unit and API contract tests.
 - `Dockerfile` and `docker-compose.yml`: containerized API and PostgreSQL runtime.
-
-## Render deployment
-
-This repository includes a [Render Blueprint](render.yaml). It creates a Docker-based
-web service and a managed PostgreSQL database in Singapore, then injects the database's
-private connection string as `DATABASE_URL`. The app applies its schema and seeds its
-demo data when it starts.
-
-1. Push this repository, including `render.yaml`, to GitHub or GitLab.
-2. In the [Render Dashboard](https://dashboard.render.com/), select **New** →
-   **Blueprint**, connect the repository, and approve the proposed resources.
-3. After the deploy finishes, open `https://<your-service>.onrender.com/health`.
-   It should return `{"status":"ok"}`. The API is then available at
-   `/api/canvas`, `/api/segments`, and `/docs`.
-
-The Blueprint uses Render's `free` plans. Choose paid plans in `render.yaml` before
-deployment if you need an always-on service or durable production database guarantees.
