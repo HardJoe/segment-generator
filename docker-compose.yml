@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: segment_generator
+      POSTGRES_USER: segment
+      POSTGRES_PASSWORD: segment
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U segment -d segment_generator"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://segment:segment@db:5432/segment_generator
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
