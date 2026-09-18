@@ -5,6 +5,15 @@ services:
     plan: free
     region: singapore
     healthCheckPath: /health
+    buildFilter:
+      ignoredPaths:
+        - docs/**
+        - tests/**
+        - README.md
+        - AGENTS.md
+        - requirements-dev.txt
+        - .github/**
+        - .gitignore
     envVars:
       - key: DATABASE_URL
         fromDatabase:
