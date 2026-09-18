@@ -35,6 +35,7 @@ python3 -m venv .venv
 
 ## Documentation
 
+- [Database](docs/database.md): table structure, constraints, and seeded graph data.
 - [Architecture](docs/architecture.md): data model and traversal design.
 - [Design decisions](docs/decisions.md): rationale for the main implementation choices.
 - [Technology stack](docs/technology-stack.md): runtime, framework, database, testing, and containerization tools used.
