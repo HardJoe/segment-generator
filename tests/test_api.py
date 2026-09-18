@@ -18,6 +18,20 @@ class UnavailableRepository(FakeRepository):
         raise OperationalError("database unavailable")
 
 
+def test_root_endpoint_introduces_the_api() -> None:
+    app = create_app()
+
+    with TestClient(app) as client:
+        response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "service": "Segment Generator API",
+        "docs": "/docs",
+        "health": "/health",
+    }
+
+
 def test_canvas_endpoint_returns_complete_canvas() -> None:
     app = create_app()
     app.dependency_overrides[get_repository] = FakeRepository

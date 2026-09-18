@@ -15,6 +15,8 @@ The API starts at `http://localhost:8000`.
 Available endpoints:
 
 ```bash
+curl http://localhost:8000/
+curl http://localhost:8000/health
 curl http://localhost:8000/api/canvas
 curl http://localhost:8000/api/segments
 ```

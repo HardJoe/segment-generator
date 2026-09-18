@@ -49,6 +49,14 @@ def serialize_canvas(canvas: Canvas) -> dict[str, list[dict[str, object]]]:
 def create_app() -> FastAPI:
     application = FastAPI(title="Segment Generator")
 
+    @application.get("/")
+    def get_root() -> dict[str, str]:
+        return {
+            "service": "Segment Generator API",
+            "docs": "/docs",
+            "health": "/health",
+        }
+
     @application.get("/health")
     def get_health(
         repository: CanvasRepository = Depends(get_repository),
