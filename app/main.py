@@ -6,6 +6,7 @@ from app.database import (
     PostgresCanvasRepository,
 )
 from app.domain import Canvas
+from app.schemas import PortReferenceResponse, SegmentResponse, SegmentsResponse
 from app.segments import SegmentGenerator
 
 
@@ -67,16 +68,29 @@ def create_app() -> FastAPI:
     ) -> dict[str, list[dict[str, object]]]:
         return serialize_canvas(repository.load_canvas())
 
-    @application.get("/api/segments")
+    @application.get("/api/segments", response_model=SegmentsResponse)
     def get_segments(
         repository: CanvasRepository = Depends(get_repository),
-    ) -> dict[str, int | list[str] | list[int]]:
+    ) -> SegmentsResponse:
         segments = SegmentGenerator(repository.load_canvas()).generate()
-        return {
-            "segment_count": len(segments),
-            "segment_list": [segment.formula for segment in segments],
-            "segment_result": [segment.result for segment in segments],
-        }
+        return SegmentsResponse(
+            segment_count=len(segments),
+            segments=[
+                SegmentResponse(
+                    target_port=PortReferenceResponse(
+                        id=segment.target.id,
+                        name=segment.target.name,
+                    ),
+                    source_ports=[
+                        PortReferenceResponse(id=source.id, name=source.name)
+                        for source in segment.sources
+                    ],
+                    formula=segment.formula,
+                    result=segment.result,
+                )
+                for segment in segments
+            ],
+        )
 
     return application
 

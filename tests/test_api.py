@@ -33,7 +33,7 @@ def test_canvas_endpoint_returns_complete_canvas() -> None:
     assert payload["nodes"][5]["ports"][0]["value"] is None
 
 
-def test_segments_endpoint_returns_formulas_and_results() -> None:
+def test_segments_endpoint_returns_self_contained_segments() -> None:
     app = create_app()
     app.dependency_overrides[get_repository] = FakeRepository
 
@@ -43,18 +43,72 @@ def test_segments_endpoint_returns_formulas_and_results() -> None:
     assert response.status_code == 200
     assert response.json() == {
         "segment_count": 9,
-        "segment_list": [
-            "2a - 1a",
-            "2b - 2a",
-            "11a - 8a",
-            "11b - 9a",
-            "11d - 10a",
-            "11c - (11a + 11b + 11d)",
-            "12a - (2b + 3a)",
-            "12b - (4a + 5a)",
-            "12c - 11c",
+        "segments": [
+            {
+                "target_port": {"id": 2, "name": "2a"},
+                "source_ports": [{"id": 1, "name": "1a"}],
+                "formula": "2a - 1a",
+                "result": -10,
+            },
+            {
+                "target_port": {"id": 3, "name": "2b"},
+                "source_ports": [{"id": 2, "name": "2a"}],
+                "formula": "2b - 2a",
+                "result": 40,
+            },
+            {
+                "target_port": {"id": 16, "name": "11a"},
+                "source_ports": [{"id": 13, "name": "8a"}],
+                "formula": "11a - 8a",
+                "result": -50,
+            },
+            {
+                "target_port": {"id": 17, "name": "11b"},
+                "source_ports": [{"id": 14, "name": "9a"}],
+                "formula": "11b - 9a",
+                "result": -20,
+            },
+            {
+                "target_port": {"id": 18, "name": "11d"},
+                "source_ports": [{"id": 15, "name": "10a"}],
+                "formula": "11d - 10a",
+                "result": -20,
+            },
+            {
+                "target_port": {"id": 19, "name": "11c"},
+                "source_ports": [
+                    {"id": 16, "name": "11a"},
+                    {"id": 17, "name": "11b"},
+                    {"id": 18, "name": "11d"},
+                ],
+                "formula": "11c - (11a + 11b + 11d)",
+                "result": -10,
+            },
+            {
+                "target_port": {"id": 20, "name": "12a"},
+                "source_ports": [
+                    {"id": 3, "name": "2b"},
+                    {"id": 4, "name": "3a"},
+                ],
+                "formula": "12a - (2b + 3a)",
+                "result": -30,
+            },
+            {
+                "target_port": {"id": 21, "name": "12b"},
+                "source_ports": [
+                    {"id": 5, "name": "4a"},
+                    {"id": 6, "name": "5a"},
+                ],
+                "formula": "12b - (4a + 5a)",
+                "result": -30,
+            },
+            {
+                "target_port": {"id": 22, "name": "12c"},
+                "source_ports": [{"id": 19, "name": "11c"}],
+                "formula": "12c - 11c",
+                "result": 100,
+            },
         ],
-        "segment_result": [-10, 40, -50, -20, -20, -10, -30, -30, 100],
     }
 
 
