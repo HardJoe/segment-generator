@@ -32,6 +32,28 @@ def test_root_endpoint_introduces_the_api() -> None:
     }
 
 
+def test_openapi_documents_root_health_and_canvas_examples() -> None:
+    schema = create_app().openapi()
+
+    assert schema["paths"]["/"]["get"]["responses"]["200"]["content"][
+        "application/json"
+    ]["example"] == {
+        "service": "Segment Generator API",
+        "docs": "/docs",
+        "health": "/health",
+    }
+    assert schema["paths"]["/health"]["get"]["responses"]["200"]["content"][
+        "application/json"
+    ]["example"] == {"status": "ok"}
+
+    canvas_example = schema["paths"]["/api/canvas"]["get"]["responses"]["200"][
+        "content"
+    ]["application/json"]["example"]
+    assert len(canvas_example["nodes"]) == 12
+    assert len(canvas_example["connections"]) == 11
+    assert canvas_example["nodes"][5]["ports"][0]["value"] is None
+
+
 def test_canvas_endpoint_returns_complete_canvas() -> None:
     app = create_app()
     app.dependency_overrides[get_repository] = FakeRepository
